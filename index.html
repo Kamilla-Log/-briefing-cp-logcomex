@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Automações Contas a Pagar — Briefing Adriano</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--pu:#6013D0;--pu2:#4a0fa5;--pu3:#8b5cf6;--ac:#FE8F1C;--gn:#16a34a;--gn2:#dcfce7;--gn3:#15803d;--rd:#dc2626;--rd2:#fee2e2;--rd3:#991b1b;--og:#fff7ed;--tl:#0891b2;--g0:#fafafa;--g1:#f4f4f5;--g2:#e4e4e7;--g4:#a1a1aa;--g6:#52525b;--g8:#27272a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff;color:var(--g8);font-size:13px;line-height:1.5}
+
+.hdr{background:linear-gradient(135deg,#4a0fa5 0%,#6013D0 50%,#FE8F1C 100%);color:#fff;padding:22px 28px}
+.hdr h1{font-size:19px;font-weight:700}
+.hdr .sub{opacity:.85;font-size:12px;margin-top:4px}
+.hdr-pills{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.18);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600}
+.pill.g{background:rgba(22,163,74,.35)}
+.pill.o{background:rgba(254,143,28,.35)}
+
+.resumo-box{background:linear-gradient(135deg,#1a0a2e 0%,#2d1452 60%,#3a1a5c 100%);color:#fff;padding:24px 28px}
+.resumo-title{font-size:16px;font-weight:700;margin-bottom:10px}
+.resumo-text{font-size:12.5px;line-height:1.65;color:rgba(255,255,255,.85);margin-bottom:18px}
+.resumo-text strong{color:#FE8F1C}
+.resumo-pills{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.resumo-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:12px 14px;text-align:center}
+.resumo-pill .rp-val{font-size:17px;font-weight:700;color:#fff;margin-bottom:4px}
+.resumo-pill .rp-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.6px;font-weight:600;color:rgba(255,255,255,.55)}
+@media(max-width:700px){.resumo-pills{grid-template-columns:repeat(2,1fr)}}
+
+.content{padding:20px 24px;max-width:1200px;margin:0 auto}
+.sec-title{font-size:15px;font-weight:700;color:var(--pu2);margin:22px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--g2)}
+.sec-title:first-of-type{margin-top:6px}
+
+.g2x{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:700px){.g2x,.g3{grid-template-columns:1fr}}
+
+.auto-card{background:#fff;border-radius:10px;padding:16px 18px;border:1px solid var(--g2);border-top:3px solid var(--pu);box-shadow:0 1px 4px rgba(96,19,208,.07)}
+.auto-card h4{font-size:13px;font-weight:700;color:var(--pu2);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.auto-card .bn{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g6);font-weight:600;margin-bottom:8px}
+.auto-card .desc{font-size:12px;color:var(--g8);line-height:1.55;margin-bottom:10px}
+.auto-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--g2);font-size:12px}
+.auto-row:last-child{border-bottom:none}
+.auto-lbl{color:var(--g6);min-width:88px;font-weight:500;flex-shrink:0}
+.auto-val{font-weight:600;color:var(--g8)}
+.auto-val strong{color:var(--gn3)}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600}
+.badge.gn{background:var(--gn2);color:var(--gn3)}
+.badge.or{background:var(--og);color:#c2410c}
+.badge.rd{background:var(--rd2);color:var(--rd3)}
+.badge.pu{background:#f3e8ff;color:var(--pu)}
+.badge.tl{background:#ecfeff;color:var(--tl)}
+
+.card{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(96,19,208,.08);border:1px solid var(--g2)}
+.card h3{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--g6);margin-bottom:6px;font-weight:600}
+.card .val{font-size:24px;font-weight:700;color:var(--pu)}
+.card .val.gn{color:var(--gn3)}
+.card .val.or{color:#c2410c}
+.card .sub{font-size:10px;color:var(--g6);margin-top:3px;line-height:1.4}
+
+.cc{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(96,19,208,.08);border:1px solid var(--g2);margin-bottom:14px}
+.cc h3{font-size:13px;font-weight:700;color:var(--pu2);margin-bottom:3px}
+.cc .csub{font-size:11px;color:var(--g6);margin-bottom:12px}
+.cw{position:relative;height:280px}
+
+.hl{border-left:4px solid;padding:11px 14px;border-radius:0 8px 8px 0;margin-bottom:10px}
+.hl.gn{border-color:var(--gn);background:#f0fdf4}
+.hl.rd{border-color:var(--rd);background:#fef2f2}
+.hl.or{border-color:var(--ac);background:var(--og)}
+.hl.pu{border-color:var(--pu);background:#f3e8ff}
+.hl.tl{border-color:var(--tl);background:#ecfeff}
+.hl .ht{font-weight:700;font-size:12.5px;margin-bottom:3px}
+.hl .hx{font-size:12px;line-height:1.55}
+
+.step-list{display:flex;flex-direction:column;gap:8px}
+.step-item{display:flex;gap:14px;padding:12px 14px;background:#fff;border:1px solid var(--g2);border-radius:10px;border-left:4px solid var(--pu);cursor:pointer;transition:all .18s;position:relative;align-items:flex-start}
+.step-item:hover{background:#faf5ff;border-color:var(--pu3)}
+.step-item .sni{background:var(--pu);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.step-item .sci{font-size:12px;line-height:1.5;color:var(--g8);flex:1}
+.step-item .sci strong{color:var(--pu2)}
+.step-item .check-mark{display:none;align-self:center;color:var(--gn3);font-weight:700;font-size:18px;flex-shrink:0;padding-left:6px}
+.step-item .del-btn{display:none;align-self:center;color:var(--rd3);font-weight:700;font-size:16px;flex-shrink:0;padding:0 8px;border-radius:4px;cursor:pointer;background:none;border:none;line-height:1}
+.step-item:hover .del-btn{display:inline-block}
+.step-item .del-btn:hover{background:var(--rd2)}
+.step-item.done{opacity:.55;border-left-color:var(--gn);background:#f0fdf4}
+.step-item.done .sni{background:var(--gn)}
+.step-item.done .sci strong{text-decoration:line-through;color:var(--gn3)}
+.step-item.done .check-mark{display:inline-block}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;background:#faf5ff;border:1.5px dashed var(--pu3);border-radius:10px;color:var(--pu);font-weight:600;font-size:12px;cursor:pointer;margin-top:6px;width:100%;transition:all .15s;font-family:inherit}
+.add-btn:hover{background:var(--pu);color:white;border-style:solid;border-color:var(--pu)}
+.frente-hint{font-size:10.5px;color:var(--g6);margin-top:4px;margin-bottom:8px;font-style:italic}
+
+.quote{background:#faf5ff;border:1px solid #e9d5ff;border-left:4px solid var(--pu);border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:10px;font-size:12.5px;line-height:1.6;color:var(--g8);font-style:italic;position:relative}
+.quote::before{content:"";position:absolute;left:8px;top:8px;font-size:34px;color:var(--pu3);opacity:.4;font-family:Georgia,serif;line-height:1}
+.quote .qlbl{display:block;font-style:normal;font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--pu);font-weight:700;margin-bottom:6px}
+
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:14px 0}
+.pn{background:#fff;border:1.5px solid var(--g2);border-radius:10px;padding:11px 8px;text-align:center}
+.pn .pi{font-size:18px;margin-bottom:4px}
+.pn .pnm{font-size:11px;font-weight:700;color:var(--pu2);line-height:1.25}
+.pn .ptp{font-size:9px;color:var(--g6);margin-top:3px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.pn.hi{border-color:var(--pu);background:#f9f5ff;box-shadow:0 2px 8px rgba(96,19,208,.1)}
+.pn.done{border-color:var(--gn);background:#f0fdf4}
+@media(max-width:700px){.pipe{grid-template-columns:repeat(2,1fr)}}
+
+.footer{padding:14px 28px;background:var(--g1);text-align:center;font-size:11px;color:var(--g6);border-top:1px solid var(--g2);margin-top:18px}
+</style></head><body>
+
+<div class="hdr">
+<h1>Automações do Contas a Pagar — Briefing para Adriano</h1>
+<div class="sub">Estado atual das frentes em curso · ROI estimado · Próximas frentes</div>
+<div class="hdr-pills">
+<span class="pill">5 frentes · 5 blocos cobertos</span>
+<span class="pill o">Ganho em horas · em revisão</span>
+<span class="pill o">Operação manual ocupa 3 dos 5 dias úteis</span>
+<span class="pill">+2 entregas complementares (UX + Onfly)</span>
+</div>
+</div>
+
+<div class="resumo-box">
+<h2 class="resumo-title">Resumo</h2>
+<p class="resumo-text">O Contas a Pagar está com foco em automações nos <strong>5 blocos principais da cadeia operacional</strong>. As frentes atuais cobrem <strong>os 5 blocos</strong> e, quando maduras, vão liberar parte significativa do tempo da Thai e da Kamilla — hoje 3 dos 5 dias úteis são consumidos integralmente pelo ciclo de pagamento manual. O <strong>volume real de horas ganhas está em revisão</strong> e será recalibrado. Adicionalmente, já foi entregue uma <strong>melhoria no fechamento mensal da UX Comex</strong> — painel com botão de envio automatizado — e está em andamento a <strong>proposta Onfly</strong> para substituir o Banco Rendimento na gestão dos cartões de viagem internacional (elimina lançamento manual no Omie de ~15 viajantes, prestação de contas via IA e centralização).</p>
+<div class="resumo-pills">
+<div class="resumo-pill"><div class="rp-val">5</div><div class="rp-lbl">Frentes em curso</div></div>
+<div class="resumo-pill"><div class="rp-val">⏳</div><div class="rp-lbl">Ganho em horas · em revisão</div></div>
+<div class="resumo-pill"><div class="rp-val">~85%</div><div class="rp-lbl">Redução média por bloco</div></div>
+<div class="resumo-pill"><div class="rp-val">4</div><div class="rp-lbl">Dependências externas</div></div>
+</div>
+</div>
+
+<div class="content">
+
+<div class="sec-title">A cadeia operacional — onde cada automação atua</div>
+<div class="pipe">
+<div class="pn hi"><div class="pi">📥</div><div class="pnm">Triagem<br>Pipefy</div><div class="ptp">Link c/ IA</div></div>
+<div class="pn hi"><div class="pi">📒</div><div class="pnm">Lançamento<br>Pipe→Omie</div><div class="ptp">Robô TREM</div></div>
+<div class="pn hi"><div class="pi">💸</div><div class="pnm">Pagamentos</div><div class="ptp">2 frentes</div></div>
+<div class="pn hi"><div class="pi">🏦</div><div class="pnm">Conciliação<br>Banco</div><div class="ptp">API Santander</div></div>
+<div class="pn hi"><div class="pi">📊</div><div class="pnm">Conciliação<br>Contábil</div><div class="ptp">n8n c/ contab.</div></div>
+</div>
+
+<div class="sec-title">As 5 frentes de automação em curso</div>
+
+<div class="g2x">
+
+<div class="auto-card">
+<div class="bn">Bloco 1 · Triagem Pipefy</div>
+<h4>🤖 Link novo com IA</h4>
+<div class="desc">Nova tela frontal de solicitação. Logger anexa o documento, IA lê e preenche campos, valida regras e políticas em tempo real (bloqueia ou alerta). O resultado final ainda gera card no Pipefy, preservando integração.</div>
+<div class="auto-row"><div class="auto-lbl">Status</div><div class="auto-val"><span class="badge or">Em construção</span> · v2 do protótipo já circulando</div></div>
+<div class="auto-row"><div class="auto-lbl">Quem toca</div><div class="auto-val">Thai (com apoio do Claude)</div></div>
+<div class="auto-row"><div class="auto-lbl">Protótipo</div><div class="auto-val"><a href="https://litter.catbox.moe/e8joqi.html" target="_blank" style="color:var(--pu); font-weight:600;">Ver protótipo navegável da Thai →</a></div></div>
+<div class="auto-row"><div class="auto-lbl">Volume</div><div class="auto-val">~340 cards/mês</div></div>
+<div class="auto-row"><div class="auto-lbl">Construção</div><div class="auto-val">Conclusão prevista até <strong>30/05/2026</strong></div></div>
+<div class="auto-row"><div class="auto-lbl">Testes</div><div class="auto-val"><strong>15/06 a 30/06/2026</strong> · piloto com loggers reais</div></div>
+<div class="auto-row"><div class="auto-lbl">Go-live</div><div class="auto-val"><strong>~julho/2026</strong> · após validação do piloto</div></div>
+<div class="auto-row"><div class="auto-lbl">Ganho</div><div class="auto-val"><span class="badge or">Em revisão</span> a calibrar com cronograma real</div></div>
+</div>
+
+<div class="auto-card">
+<div class="bn">Bloco 2 · Lançamento Pipe → Omie</div>
+<h4>⚙️ Robô do TREM (time interno)</h4>
+<div class="desc">Robô lê cards aprovados no Pipefy e gera os lançamentos no Omie automaticamente. Importação via planilha foi testada antes e descartada com relatório formal (60% sucesso, alta taxa de erro).</div>
+<div class="auto-row"><div class="auto-lbl">Status</div><div class="auto-val"><span class="badge rd">Testes iniciados · cards não sobem</span></div></div>
+<div class="auto-row"><div class="auto-lbl">Quem toca</div><div class="auto-val">Kamilla</div></div>
+<div class="auto-row"><div class="auto-lbl">Destrave</div><div class="auto-val">Reunião com Ronaldo agendada para segunda</div></div>
+<div class="auto-row"><div class="auto-lbl">Escopo F1</div><div class="auto-val">SEM rateio, folha DP e internacional</div></div>
+<div class="auto-row"><div class="auto-lbl">Go-live F1</div><div class="auto-val">~maio/2026 · após destrave dos cards</div></div>
+<div class="auto-row"><div class="auto-lbl">Ganho</div><div class="auto-val"><strong>~70–80h/mês</strong> quando autônomo</div></div>
+</div>
+
+<div class="auto-card" style="border-top-color:var(--ac);grid-column:span 2">
+<div class="bn">Bloco 3 · Pagamentos</div>
+<h4>📊 Automação da janela de pagamento + portal de aprovação da diretoria</h4>
+<div class="desc">Frente priorizada pelo Adriano: hoje a planilha da janela é gerada <strong>manualmente</strong> pela Thai (1 dia de trabalho/janela) e a aprovação da diretoria é via e-mail. Visão alvo: <strong>geração automatizada</strong> da janela direto do Omie + <strong>diretório próprio</strong> onde a diretoria entra para aprovar os pagamentos da semana, com <strong>histórico das janelas anteriores</strong> para consulta e <strong>botão de envio para e-mail</strong> integrado. Em paralelo, o <strong>robô de conferência da janela já está em uso semanal</strong> e ajudando ativamente — esse continua evoluindo e se conecta com a nova arquitetura.</div>
+<div class="auto-row"><div class="auto-lbl">Status</div><div class="auto-val"><span class="badge gn">Mockup validado por Adriano</span> · construção do workflow n8n <strong>pausada</strong></div></div>
+<div class="auto-row"><div class="auto-lbl">Rota técnica</div><div class="auto-val"><strong>n8n + Google Sheets + HTML</strong> · mesma stack da conciliação contábil</div></div>
+<div class="auto-row"><div class="auto-lbl">Quem toca</div><div class="auto-val">Kamilla (apoio: Carol no n8n + Claude)</div></div>
+<div class="auto-row"><div class="auto-lbl">Mockup</div><div class="auto-val"><a href="https://portal-pagamentos-logcomex.netlify.app" target="_blank" style="color:var(--pu); font-weight:600;">Ver portal navegável →</a> <span class="badge gn" style="margin-left:6px;">Aprovado</span></div></div>
+<div class="auto-row"><div class="auto-lbl">Em uso hoje</div><div class="auto-val">Robô de conferência da janela <span class="badge gn">Ativo</span></div></div>
+<div class="auto-row"><div class="auto-lbl">Bloqueio atual</div><div class="auto-val"><span class="badge or">Aguardando</span> Adriano está alinhando pontos técnicos do n8n com o Ramon. Retorna com a Kamilla antes do início da construção do "por trás" do portal.</div></div>
+<div class="auto-row"><div class="auto-lbl">Volume</div><div class="auto-val">~78 pagamentos/janela · ~390/mês</div></div>
+<div class="auto-row"><div class="auto-lbl">Piloto</div><div class="auto-val">A revisar após retorno do Adriano</div></div>
+<div class="auto-row"><div class="auto-lbl">Go-live</div><div class="auto-val">A revisar após retorno do Adriano</div></div>
+<div class="auto-row"><div class="auto-lbl">Ganho</div><div class="auto-val"><span class="badge or">Em revisão</span> a calibrar com cronograma real</div></div>
+</div>
+
+<div class="auto-card">
+<div class="bn">Bloco 4 · Conciliação Banco</div>
+<h4>🏦 API Omie ↔ Banco Santander</h4>
+<div class="desc">Integração para extrato bancário automatizado (peça central da conciliação) + boletos/Pix de saída, eliminando o cadastro manual no banco e o acompanhamento de retornos via planilha. Atua sobre Bloco 3 (pagamentos) e Bloco 4 (conciliação).</div>
+<div class="auto-row"><div class="auto-lbl">Status</div><div class="auto-val"><span class="badge or">Em andamento</span> · pontos de alerta mapeados</div></div>
+<div class="auto-row"><div class="auto-lbl">Quem toca</div><div class="auto-val">Kamilla</div></div>
+<div class="auto-row"><div class="auto-lbl">Próximo</div><div class="auto-val">Retornar ao Santander semana que vem com os pontos de alerta</div></div>
+<div class="auto-row"><div class="auto-lbl">Apoio</div><div class="auto-val">Damasceno + Contas a Receber · Omie já tem o módulo</div></div>
+<div class="auto-row"><div class="auto-lbl">Go-live</div><div class="auto-val"><strong>Início dos testes na janela de 24/06</strong></div></div>
+<div class="auto-row"><div class="auto-lbl">Ganho</div><div class="auto-val"><strong>~10h/mês</strong> + base p/ conciliação auto</div></div>
+</div>
+
+<div class="auto-card" style="border-top-color:var(--tl)">
+<div class="bn">Bloco 5 · Conciliação Contábil</div>
+<h4>🔗 Workflow n8n com a contabilidade</h4>
+<div class="desc">Em construção pela Kamilla: automatizar conferências e fechamentos contábeis via workflows no n8n. Liberação obtida para conectar com o ambiente da contabilidade e criar o fluxo. Em paralelo: fórum recorrente com a contabilidade para melhorias do dia a dia e relatório semanal já entregue mais enxuto. <strong>Esta semana, junto com a construção do workflow do portal de pagamentos, também avanço com o workflow da conciliação contábil.</strong></div>
+<div class="auto-row"><div class="auto-lbl">Status</div><div class="auto-val"><span class="badge or">Em construção</span> · workflow n8n essa semana</div></div>
+<div class="auto-row"><div class="auto-lbl">Quem toca</div><div class="auto-val">Kamilla</div></div>
+<div class="auto-row"><div class="auto-lbl">Parceiros</div><div class="auto-val">Carol (contabilidade)</div></div>
+<div class="auto-row"><div class="auto-lbl">Governança</div><div class="auto-val">Fórum recorrente + relatório enxuto entregue</div></div>
+<div class="auto-row"><div class="auto-lbl">Go-live</div><div class="auto-val">A definir · em construção do workflow</div></div>
+<div class="auto-row"><div class="auto-lbl">Ganho</div><div class="auto-val"><span class="badge or">Em revisão</span> a calibrar com cronograma real</div></div>
+</div>
+
+</div>
+
+<div class="sec-title">Plus · entregas complementares ao escopo principal</div>
+
+<div class="hl pu" style="border-left-width:6px">
+<div class="ht">🚀 Fechamento mensal UX Comex — painel com envio automatizado</div>
+<div class="hx">Fora da cadeia operacional da Logcomex, mas dentro do mesmo eixo de eficiência: foi construído um painel próprio para o fechamento mensal da UX Comex, com <strong>botão de envio automatizado do fechamento</strong>. Hoje em produção — reduz o esforço operacional do fechamento da UX e libera tempo para análise. Mesma lógica de "operar menos, analisar mais" sendo aplicada nas duas pernas do grupo.</div>
+</div>
+
+<div class="hl or" style="border-left-width:6px">
+<div class="ht">✈️ Onfly — Modernização dos cartões de viagem internacional</div>
+<div class="hx">Proposta em andamento para substituir o Banco Rendimento pela Onfly na gestão dos cartões de viagem internacional. Toca múltiplos blocos da cadeia operacional ao mesmo tempo: <strong>elimina lançamento manual no Omie</strong> (integração via API · ~15 viajantes hoje 100% manuais), <strong>elimina prestação de contas em planilha</strong> (IA lê os comprovantes pelo app), <strong>elimina logins individuais</strong> (painel único Logcomex), <strong>libera saldo em tempo real</strong> (sem mais espera de recarga) e <strong>centraliza tudo numa conta BTG</strong> vinculada à plataforma. Investimento efetivo de implantação: <strong>R$ 130,00</strong> (10 cartões compartilháveis entre colaboradores) + recarga inicial de R$ 5.000 na conta centralizadora (recuperável via TED). <a href="https://proposta-onfly.netlify.app/" style="color:var(--pu); font-weight:600;">Ver proposta completa →</a></div>
+</div>
+
+<div class="sec-title">ROI consolidado quando todas amadurecerem</div>
+
+<div class="hl or" style="border-left-width:6px">
+<div class="ht">⏳ ROI em revisão</div>
+<div class="hx">Os números preliminares de horas (já apresentados em versões anteriores) estavam <strong>subestimados</strong> — a operação consome mais tempo do que estava registrado. Kamilla está mapeando junto com a Thai o cronograma real semanal para calibrar os ganhos corretamente antes de reapresentar.</div>
+</div>
+
+
+<div class="sec-title">Dependências externas — o que está fora do meu controle</div>
+
+<div class="g2x">
+<div class="hl rd"><div class="ht">Políticas para validar com você (Adriano)</div><div class="hx">Pagamentos BR + Reembolso + Viagens Internacionais. Sem elas aprovadas, o link novo da Thai não tem regras embarcadas pra validar. <strong>Bloqueio crítico do Bloco 1.</strong></div></div>
+
+<div class="hl or"><div class="ht">3 melhorias em desenvolvimento pelo Omie</div><div class="hx">Campo adicional + filtros, multi-moeda, tela de rateio. Necessárias para implementar as TAGs (Anexo vinculado, Remessa/Manual, Recorrência) que medem o 90% docs vinculados.</div></div>
+
+<div class="hl tl"><div class="ht">Cronograma do TREM para fase 2 do robô</div><div class="hx">Após os testes da fase 1 (~2 semanas a partir de 22/04), reunião para definir escopo da fase 2 (rateio, folha DP, internacional). Destrava o ROI completo do Bloco 2.</div></div>
+</div>
+
+<div class="sec-title">Próximas frentes</div>
+<div class="frente-hint">Clique em uma frente para marcar como concluída · passe o mouse para excluir · use o botão abaixo para adicionar novas. As alterações ficam salvas no seu navegador.</div>
+
+<div class="step-list" id="frentes-list"></div>
+<button class="add-btn" onclick="addFrente()">+ Adicionar nova frente</button>
+
+</div>
+
+<div class="footer">
+Briefing executivo · Contas a Pagar 2026 · Logcomex · gerado para reunião com Adriano
+</div>
+
+<script>
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size=11;
+Chart.defaults.color="#52525b";
+const c={pu:"#6013D0",pu2:"#4a0fa5",pu3:"#8b5cf6",ac:"#FE8F1C",gn:"#15803d",rd:"#991b1b",tl:"#0891b2",g4:"#a1a1aa"};
+
+new Chart(document.getElementById('ch-roi'),{
+  type:'bar',
+  data:{
+    labels:['Bloco 1\nTriagem','Bloco 2\nLançamento','Bloco 3\nPagamentos'],
+    datasets:[
+      {label:'Hoje (horas/mês)',data:[68,99,60],backgroundColor:c.rd,borderRadius:4},
+      {label:'Pós-automação (horas/mês)',data:[11,15,9],backgroundColor:c.gn,borderRadius:4}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top'},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+'h/mês'}}},
+    scales:{
+      y:{beginAtZero:true,title:{display:true,text:'Horas úteis/mês'},grid:{color:'#f4f4f5'}},
+      x:{grid:{display:false}}
+    }
+  }
+});
+
+// ============ FRENTES DINÂMICAS ============
+const STORAGE_KEY='cp_frentes_v1';
+const DEFAULT_FRENTES=[
+  {id:'f1',title:'Acompanhar fase 1 do robô do TREM',desc:'Thai conduzindo testes com cards reais, registrando inconsistências na planilha de homologação. Reunião de avaliação no início de maio para decidir fase 2.',done:false},
+  {id:'f2',title:'Voltar com o Santander sobre integração API',desc:'Formalizar pontos de alerta identificados e solicitar próximos passos para iniciar testes da integração de boletos/Pix e extrato. Envolver Damasceno e Contas a Receber. Início dos testes na janela de 24/06.',done:false},
+  {id:'f3',title:'Trabalhar no fluxo do n8n para conciliação contábil',desc:'Desenhar e implementar o workflow de conciliação contábil no n8n, conectando o ambiente da contabilidade e o do CP.',done:false},
+  {id:'f4',title:'Acompanhar construção do link novo com IA (Thai)',desc:'Revisar lógica das regras, fluxo de bloqueio × alerta, UX do logger e métricas de instrumentação antes do go-live.',done:false},
+  {id:'f5',title:'Cobrar fechamento das 3 políticas com Adriano',desc:'Destrava as validações automáticas do link novo e o início da implementação no Pipefy.',done:false},
+  {id:'f6',title:'Desenhar arquitetura do diretório de aprovação de pagamentos',desc:'Conceito pedido pelo Adriano: portal único onde a diretoria entra para aprovar a janela da semana, com histórico das janelas anteriores e botão de envio para e-mail. Trabalho dessa semana com o Claude.',done:false},
+  {id:'f7',title:'Criar novos controles de investimento e aplicações',desc:'Estruturar o acompanhamento das aplicações financeiras (renovações, rendimentos, vencimentos, diversificação) para apoiar a meta de 2% de caixa offshore e a gestão estratégica de liquidez.',done:false},
+  {id:'f8',title:'Implementar fórum mensal com Marketing',desc:'Replicar com MKT o modelo de fórum recorrente que já existe com a contabilidade. Ritual mensal para alinhamento de pagamentos, cobranças, prazos e cadastros, reduzindo ruído operacional e ofensores de exceção.',done:false}
+];
+
+let frentes=loadFrentes();
+
+function loadFrentes(){
+  try{
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(saved){return JSON.parse(saved);}
+  }catch(e){console.warn('Erro ao carregar frentes:',e);}
+  return JSON.parse(JSON.stringify(DEFAULT_FRENTES));
+}
+
+function saveFrentes(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(frentes));}
+  catch(e){console.warn('Erro ao salvar frentes:',e);}
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+function renderFrentes(){
+  const list=document.getElementById('frentes-list');
+  list.innerHTML='';
+  frentes.forEach((f,i)=>{
+    const item=document.createElement('div');
+    item.className='step-item'+(f.done?' done':'');
+    item.dataset.id=f.id;
+    item.innerHTML=
+      '<div class="sni">'+(i+1)+'</div>'+
+      '<div class="sci"><strong>'+escapeHtml(f.title)+'</strong>'+(f.desc?' — '+escapeHtml(f.desc):'')+'</div>'+
+      '<span class="check-mark">✓</span>'+
+      '<button class="del-btn" title="Excluir frente">✕</button>';
+    item.querySelector('.del-btn').onclick=function(e){
+      e.stopPropagation();
+      if(confirm('Excluir essa frente?')){deleteFrente(f.id);}
+    };
+    item.onclick=function(){toggleDone(f.id);};
+    list.appendChild(item);
+  });
+}
+
+function toggleDone(id){
+  const f=frentes.find(x=>x.id===id);
+  if(f){f.done=!f.done;saveFrentes();renderFrentes();}
+}
+
+function deleteFrente(id){
+  frentes=frentes.filter(x=>x.id!==id);
+  saveFrentes();renderFrentes();
+}
+
+function addFrente(){
+  const title=prompt('Título da nova frente:');
+  if(!title||!title.trim())return;
+  const desc=prompt('Descrição (opcional):')||'';
+  const id='f'+Date.now();
+  frentes.push({id,title:title.trim(),desc:desc.trim(),done:false});
+  saveFrentes();renderFrentes();
+}
+
+renderFrentes();
+</script>
+
+</body></html>
